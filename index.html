@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ✏️ CUSTOMIZE: browser tab title -->
+<title>NullTrace — Forensics, Recovery & Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+:root{--bg:#070815;--tx:#eef0fb;--mut:#9aa3c4;--a:#8b5cf6;--b:#22d3ee;--r:#ff4d6d;--gold:#ffd24a;--f:'Space Grotesk',system-ui,sans-serif;--m:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.65 var(--f);min-height:100vh;overflow-x:hidden}
+a{color:var(--b);text-decoration:none}
+:focus-visible{outline:2px solid var(--b);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;transition:opacity .6s;background:radial-gradient(circle at 30% 20%,#2a1b6b,#070815 70%)}
+body[data-page=home] #gl{opacity:0}
+/* glass */
+.glass,.card,.sup,.cm,.panel{background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.03));backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 22px 50px rgba(0,0,0,.35);border-radius:22px}
+/* NAV */
+nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,8,21,.55);border-bottom:1px solid rgba(255,255,255,.1)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;color:var(--tx)}
+.logo i{width:30px;height:30px;border-radius:9px;background:conic-gradient(from 200deg,var(--a),var(--b),var(--gold),var(--a));display:grid;place-items:center;font:600 14px var(--m);color:#fff;font-style:normal}
+.nl a{color:var(--mut);margin-left:8px;font-size:15px;padding:8px 14px;border-radius:99px;transition:.2s}
+.nl a:hover,.nl a.on{color:#fff;background:rgba(255,255,255,.1)}
+#prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:40;background:linear-gradient(90deg,var(--a),var(--b),var(--gold))}
+/* HOME */
+.hero{position:relative;height:calc(100vh - 64px);min-height:560px;display:grid;align-items:center}
+#net{position:absolute;inset:0;width:100%;height:100%}
+.hero .wrap{pointer-events:none}.hero .wrap>*{pointer-events:auto}
+.term{font:13px var(--m);color:var(--b);margin-bottom:18px;min-height:20px}
+.term:after{content:"▍";animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
+h1{font-size:clamp(40px,7vw,86px);line-height:1.02;letter-spacing:-2px;max-width:840px}
+h1 span{background:linear-gradient(90deg,var(--a),var(--b) 60%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:540px;color:var(--mut);margin:20px 0 32px;font-size:18px}
+.stats{display:flex;gap:34px;margin-top:40px;font:13px var(--m);color:var(--mut)}.stats b{display:block;color:var(--tx);font:700 22px var(--f)}
+/* GOLD GLITTER BUTTON */
+.gold{position:relative;display:inline-flex;align-items:center;gap:10px;padding:17px 36px;border-radius:16px;font:700 18px var(--f);color:#2a1a00;
+background:linear-gradient(110deg,#b8860b,#ffd700 25%,#fff3b0 45%,#ffd700 60%,#c9921a 80%,#ffd700);background-size:250% 100%;animation:gl 3.2s linear infinite;
+box-shadow:inset 0 0 0 1px rgba(255,235,160,.7),0 0 36px rgba(255,200,60,.55),0 12px 30px rgba(0,0,0,.4);transition:transform .2s}
+.gold:hover{transform:translateY(-3px) scale(1.05);color:#2a1a00}
+@keyframes gl{to{background-position:-250% 0}}
+.sp{position:absolute;width:var(--s);height:var(--s);pointer-events:none;background:radial-gradient(circle,#fff 0 25%,rgba(255,225,120,.95) 45%,transparent 72%);clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);animation:tw 1s ease-out forwards}
+@keyframes tw{0%{transform:scale(0) rotate(0);opacity:1}60%{opacity:1}100%{transform:translateY(-24px) scale(1) rotate(120deg);opacity:0}}
+/* POSTS PAGE */
+.ph{padding:56px 0 24px}.ph h1{font-size:clamp(38px,6vw,64px);letter-spacing:-2px}
+.ph p{color:var(--mut);margin:8px 0 22px}
+.search{width:100%;max-width:420px;padding:13px 18px;border-radius:99px;color:var(--tx);font:15px var(--f);outline:0}
+.search::placeholder{color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 26px}
+.chip{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);backdrop-filter:blur(10px);color:var(--mut);padding:6px 15px;border-radius:99px;font:13px var(--m);cursor:pointer;transition:.2s}
+.chip.on,.chip:hover{color:#fff;background:rgba(139,92,246,.4);border-color:var(--a)}
+#msg{font:13px var(--m);color:var(--gold);margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;padding-bottom:80px;perspective:1000px}
+.card{display:block;color:var(--tx);padding:26px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .3s;will-change:transform}
+.card:before{content:"";position:absolute;inset:0;background:radial-gradient(280px circle at var(--x,50%) var(--y,0),rgba(255,255,255,.16),transparent);opacity:0;transition:.3s}
+.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--ang),transparent 0 55%,var(--b),var(--a),var(--gold),transparent);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:0;transition:.3s;animation:sn 4s linear infinite;pointer-events:none}
+@keyframes sn{to{--ang:360deg}}
+.card:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 30px 60px rgba(80,40,200,.35)}.card:hover:before,.card:hover:after{opacity:1}
+.card>*{position:relative}
+.cat{display:inline-block;font:600 12px var(--m);color:var(--b);background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);padding:3px 11px;border-radius:99px}
+.card h3{font-size:22px;line-height:1.25;margin:14px 0 8px}.card p{color:var(--mut);font-size:15px}
+.meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font:12px var(--m);color:var(--mut)}
+.sk{height:200px;border-radius:22px;background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.04) 70%);background-size:200%;animation:sh 1.3s infinite}@keyframes sh{to{background-position:-200% 0}}
+@media(min-width:900px){.card.big{grid-column:span 2}.card.big h3{font-size:32px}}
+/* POST PAGE */
+.post{max-width:800px;margin:36px auto 90px;padding:44px}
+.post h1{font-size:clamp(30px,5vw,50px);letter-spacing:-1.5px;margin-top:16px}
+.post .meta{margin:16px 0 8px}
+.body h2{font-size:25px;margin:34px 0 8px}.body p,.body ul{margin:14px 0;color:#d6daee}.body ul{padding-left:22px}
+.body code{font-family:var(--m);background:rgba(255,255,255,.1);padding:2px 6px;border-radius:5px;font-size:.88em}
+.body pre{background:rgba(2,4,12,.7);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;overflow-x:auto;margin:18px 0}
+.body pre code{background:none;padding:0;color:#9be7ff}
+.tag{font:12px var(--m);color:var(--mut);margin-right:10px}
+.sup{display:flex;gap:20px;align-items:center;padding:18px;margin:28px 0;border-color:rgba(255,210,74,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 40px rgba(255,200,60,.15)}
+.qr{background:#fff;padding:8px;border-radius:12px;line-height:0}
+.sup h4{font-size:18px}.sup p{color:var(--mut);font-size:14px;margin:4px 0 10px}.sup code{font-family:var(--m)}
+.btn{display:inline-block;border:0;cursor:pointer;font:600 15px var(--f);padding:11px 22px;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--a),#4f46e5);box-shadow:0 0 26px rgba(139,92,246,.5)}
+.cm{padding:24px;margin-top:10px}
+.cm input,.cm textarea{width:100%;margin:8px 0;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.35);color:var(--tx);font:15px var(--f)}
+.cm textarea{min-height:110px;resize:vertical}
+.ok{color:#4ade80;margin-top:10px}.er{color:var(--r);margin-top:10px}
+.empty{color:var(--mut);padding:30px;text-align:center;border-radius:18px}
+footer{padding:28px 0;color:var(--mut);font-size:14px;text-align:center;position:relative;z-index:1}
+@media(max-width:600px){.sup{flex-direction:column;text-align:center}.post{padding:24px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-page="home">
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="prog"></div>
+<nav><div class="wrap">
+  <a class="logo" href="#/"><i id="lg"></i><span id="sn"></span></a>
+  <div class="nl" id="nl"></div>
+</div></nav>
+
+<!-- ============ PAGE 1 : HOME (no posts here, only the hero) ============ -->
+<main id="home">
+  <header class="hero">
+    <canvas id="net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="term" id="term"></div>
+      <h1 id="ht"></h1><p id="hp"></p>
+      <a class="gold" id="go" href="#/posts">Go to Posts ✦</a>
+      <div class="stats"><div><b id="sP">–</b>posts</div><div><b id="sC">–</b>topics</div><div><b>live</b>from GitHub</div></div>
+    </div>
+  </header>
+</main>
+
+<!-- ============ PAGE 2 : POSTS LIST ============ -->
+<main id="listPage" hidden><div class="wrap">
+  <div class="ph"><h1>Posts</h1><p>Forensics, recovery and research notes.</p>
+    <input class="search glass" id="q" placeholder="Search posts…" aria-label="Search posts">
+    <div class="chips" id="chips"></div><div id="msg"></div></div>
+  <div class="grid" id="grid"></div>
+</div></main>
+
+<!-- ============ PAGE 3 : SINGLE POST ============ -->
+<main id="postPage" hidden><div class="wrap"><article class="post panel" id="art"></article></div></main>
+
+<footer><div class="wrap">© <span id="yr"></span> <span id="fn"></span> · by <span id="fa"></span></div></footer>
+
+<script>
+/* =====================================================================
+   ✏️ CUSTOMIZE — EDIT ONLY THIS BLOCK
+   ===================================================================== */
+const CONFIG = {
+  siteName:  "NullTrace",            // ✏️ brand / logo text
+  logoLetter:"N",                    // ✏️ letter inside the logo badge
+  authorName:"Your Name",            // ✏️ footer + default post author
+  heroTitle: "Evidence never lies. <span>We just learn to read it.</span>", // ✏️ headline (HTML ok)
+  heroText:  "Field notes on digital forensics, data recovery and security research.", // ✏️
+  terminalLines: [                   // ✏️ lines typed in the hero terminal
+    "$ mount -o ro,loop evidence.dd /mnt/case01",
+    "$ vol.py -f memdump.raw windows.pslist",
+    "$ photorec /d recovered/ /cmd disk.img search"
+  ],
+  extraLinks: [["GitHub","https://github.com/"]],   // ✏️ extra header links (Home + Posts are built in)
+
+  /* GitHub: LEAVE owner/repo EMPTY — they are detected from your
+     github.io address. Fill them only if you use a custom domain. */
+  github: { owner:"", repo:"", folder:"posts" },
+
+  commentEmail: "you@example.com",   // ✏️ comments are emailed here (formsubmit.co, first mail needs one-time activation)
+  upiId:   "yourname@upi",           // ✏️ your UPI ID
+  upiName: "Your Name",              // ✏️ name shown in the UPI app
+  supportTitle: "Enjoyed this? Buy me a coffee ☕",              // ✏️
+  supportText:  "Scan with any UPI app to support more free research." // ✏️
+};
+
+/* Demo posts: shown only while previewing locally (not on github.io). Safe to delete. */
+const DEMO = {
+"2026-10-06-memory-forensics.txt":`First Steps in Memory Forensics
+category: Forensics
+tags: volatility, memory
+---
+## Why memory?
+Disk tells you what *was* stored. Memory tells you what is **running**.
+\`\`\`
+vol.py -f mem.raw windows.pslist
+\`\`\`
+- Check odd parent/child chains`,
+"2026-10-01-recover-deleted.txt":`TITLE: Recovering Files from a Formatted Drive
+CATEGORY: Recovery
+SUMMARY: File carving basics when the file table is gone.
+---
+Never write to the damaged disk. Work on an image.`
+};
+
+const $=s=>document.querySelector(s), esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let POSTS=[],LOADED=false,filter="All",NOTE="";
+
+/* static text */
+$('#sn').textContent=$('#fn').textContent=CONFIG.siteName; $('#lg').textContent=CONFIG.logoLetter;
+$('#fa').textContent=CONFIG.authorName; $('#yr').textContent=new Date().getFullYear();
+$('#ht').innerHTML=CONFIG.heroTitle; $('#hp').textContent=CONFIG.heroText;
+$('#nl').innerHTML=`<a href="#/" data-r="home">Home</a><a href="#/posts" data-r="posts">Posts</a>`+CONFIG.extraLinks.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join("");
+
+/* =====================================================================
+   TXT → POST  (forgiving, regex based)
+   Simplest valid post = a title on line 1, then your text. Nothing else needed.
+   Optional lines (any order, any case):  date: category: tags: author: summary: title:
+   A line of --- (within the first 15 lines) ends the header.
+   ===================================================================== */
+const RE_KEY  = /^\s*(title|date|category|tags|author|summary)\s*[:=]\s*(.+?)\s*$/i;
+const RE_SEP  = /^\s*-{3,}\s*$/;
+const RE_DATE = /(\d{4})[-_.\/](\d{1,2})[-_.\/](\d{1,2})/;
+function parsePost(file, raw){
+  const L=raw.replace(/^\uFEFF/,"").replace(/\r\n?/g,"\n").trim().split("\n"), f={}, name=file.replace(/\.txt$/i,"");
+  let sep=L.findIndex(l=>RE_SEP.test(l)), end;
+  if(sep>=0&&sep<=15) end=sep; else { sep=-1; end=1; while(end<L.length&&RE_KEY.test(L[end]))end++ }
+  let titleLine="";
+  for(const l of L.slice(0,end)){const m=l.match(RE_KEY); if(m)f[m[1].toLowerCase()]=m[2]; else if(!titleLine&&l.trim())titleLine=l.replace(/^#+\s*/,"").trim()}
+  const body=L.slice(sep>=0?sep+1:end).join("\n").trim();
+  const dm=(f.date||"").match(RE_DATE)||name.match(RE_DATE);
+  const date=dm?`${dm[1]}-${dm[2].padStart(2,"0")}-${dm[3].padStart(2,"0")}`:"1970-01-01";
+  return { slug:name, date,
+    title:f.title||titleLine||name.replace(RE_DATE,"").replace(/^[-_\s]+/,"").replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()),
+    category:f.category||"General", author:f.author||CONFIG.authorName,
+    tags:(f.tags||"").split(/\s*[,;]\s*/).filter(Boolean),
+    summary:f.summary||body.replace(/```[\s\S]*?```/g,"").replace(/[#*`>\-\[\]]/g,"").replace(/\s+/g," ").trim().slice(0,150)+"…",
+    body, mins:Math.max(1,Math.round(body.split(/\s+/).length/200)) };
+}
+/* mini markdown: ## heading, - list, ``` code, **bold**, *italic*, `code`, [text](url) */
+function render(t){
+  const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>").replace(/`(.+?)`/g,"<code>$1</code>").replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return t.split(/```/).map((p,i)=>i%2?`<pre><code>${esc(p.replace(/^[\w+-]*\n/,""))}</code></pre>`:
+    p.split(/\n\s*\n/).map(b=>{b=b.trim();if(!b)return"";
+      if(/^#{1,3}\s/.test(b))return`<h2>${inl(b.replace(/^#+\s*/,""))}</h2>`;
+      if(/^[-*]\s/.test(b))return`<ul>${b.split("\n").map(l=>`<li>${inl(l.replace(/^[-*]\s*/,""))}</li>`).join("")}</ul>`;
+      return`<p>${inl(b).replace(/\n/g,"<br>")}</p>`}).join("")).join("");
+}
+
+/* ---------- GitHub loading: repo is auto-detected from the site address ---------- */
+function repoInfo(){
+  const g=CONFIG.github; if(g.owner&&g.repo)return{o:g.owner,r:g.repo};
+  const h=location.hostname; if(!h.endsWith(".github.io"))return null;
+  const o=h.split(".")[0], seg=location.pathname.split("/")[1]||"";
+  return{o,r:seg&&!seg.includes(".")?seg:o+".github.io"};
+}
+async function fileText(x){
+  try{const r=await fetch(`${CONFIG.github.folder}/${encodeURIComponent(x.name)}?v=${Date.now()}`),t=await r.text();
+    if(r.ok&&!/^\s*<(!doctype|html)/i.test(t))return t}catch(e){}
+  return (await fetch(x.download_url)).text();
+}
+async function load(){
+  const ri=repoInfo(), g=CONFIG.github; let files=null;
+  try{
+    if(!ri){files=Object.entries(DEMO);NOTE="Preview mode: showing demo posts. On your github.io site this reads the /"+g.folder+" folder automatically."}
+    else{
+      const r=await fetch(`https://api.github.com/repos/${ri.o}/${ri.r}/contents/${g.folder}`);
+      if(r.status==404)throw new Error(`Folder "${g.folder}" not found in ${ri.o}/${ri.r}. Create it and add a .txt file.`);
+      if(!r.ok)throw new Error("GitHub answered "+r.status+" (rate limit? wait a few minutes).");
+      const list=await r.json();
+      files=await Promise.all(list.filter(x=>x.type==="file"&&/\.txt$/i.test(x.name)).map(async x=>[x.name,await fileText(x)]));
+      try{localStorage.setItem("posts_cache",JSON.stringify(files))}catch(e){}
+    }
+  }catch(e){
+    try{files=JSON.parse(localStorage.getItem("posts_cache"))}catch(_){}
+    NOTE=e.message+(files?" Showing last saved copy.":""); files=files||[];
+  }
+  POSTS=files.map(([n,t])=>{try{return parsePost(n,t)}catch(e){return null}}).filter(Boolean)
+    .sort((a,b)=>b.date.localeCompare(a.date)||b.slug.localeCompare(a.slug));
+  LOADED=true; $('#sP').textContent=POSTS.length; $('#sC').textContent=new Set(POSTS.map(p=>p.category)).size;
+  route(false);
+}
+
+/* ---------- Posts page ---------- */
+function drawList(){
+  $('#msg').textContent=NOTE;
+  if(!LOADED){$('#grid').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';return}
+  const cats=["All",...new Set(POSTS.map(p=>p.category))], q=$('#q').value.toLowerCase();
+  $('#chips').innerHTML=cats.map(c=>`<button class="chip ${c==filter?"on":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filter=b.dataset.c;drawList()});
+  const L=POSTS.filter(p=>(filter=="All"||p.category==filter)&&(p.title+p.summary+p.category+p.tags.join(" ")).toLowerCase().includes(q));
+  $('#grid').innerHTML=L.length?L.map((p,i)=>`<a class="card ${i==0&&filter=="All"&&!q?"big":""}" href="#/post/${encodeURIComponent(p.slug)}">
+    <span class="cat">${esc(p.category)}</span><h3>${esc(p.title)}</h3><p>${esc(p.summary)}</p>
+    <div class="meta"><span>${p.date}</span><span>${p.mins} min read</span>${p.tags.slice(0,3).map(t=>`<span>#${esc(t)}</span>`).join("")}</div></a>`).join("")
+    :`<div class="empty glass">No posts found. Add a .txt file to the <code>${esc(CONFIG.github.folder)}</code> folder.</div>`;
+  document.querySelectorAll(".card").forEach(c=>{            // 3D tilt + light follow
+    c.onmousemove=e=>{const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+      c.style.setProperty("--x",x+"px");c.style.setProperty("--y",y+"px");
+      c.style.transform=`rotateX(${((y/r.height)-.5)*-9}deg) rotateY(${((x/r.width)-.5)*9}deg) translateY(-4px)`};
+    c.onmouseleave=()=>c.style.transform=""});
+}
+$('#q').oninput=drawList;
+
+/* ---------- Support block (UPI QR) — placed above AND below each post ---------- */
+const upiLink=()=>`upi://pay?pa=${encodeURIComponent(CONFIG.upiId)}&pn=${encodeURIComponent(CONFIG.upiName)}&cu=INR`;
+const support=()=>`<div class="sup"><div class="qr"></div><div><h4>${esc(CONFIG.supportTitle)}</h4><p>${esc(CONFIG.supportText)}</p>
+  <code>${esc(CONFIG.upiId)}</code><br><br><a class="btn" href="${upiLink()}">Pay with UPI app</a></div></div>`;
+
+/* ---------- Single post page ---------- */
+function drawPost(slug){
+  if(!LOADED){$('#art').innerHTML='<div class="sk"></div>';return}
+  const p=POSTS.find(x=>x.slug==slug);
+  if(!p){$('#art').innerHTML='<div class="empty">Post not found. <a href="#/posts">Back to posts</a></div>';return}
+  document.title=p.title+" · "+CONFIG.siteName;
+  $('#art').innerHTML=`<a href="#/posts">← All posts</a><br><span class="cat" style="margin-top:20px">${esc(p.category)}</span>
+  <h1>${esc(p.title)}</h1><div class="meta"><span>${esc(p.author)}</span><span>${p.date}</span><span>${p.mins} min read</span></div>
+  ${support()}<div class="body">${render(p.body)}</div>
+  <div>${p.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join("")}</div>${support()}
+  <div class="cm"><h3>Feedback</h3><p style="color:var(--mut);font-size:14px">Your message goes straight to my inbox.</p>
+  <input id="cn" placeholder="Your name" maxlength="60"><input id="ce" type="email" placeholder="Email (optional, for a reply)">
+  <textarea id="ct" placeholder="Write your comment…"></textarea><button class="btn" id="cs">Send comment</button><div id="cr"></div></div>`;
+  document.querySelectorAll(".qr").forEach(q=>{if(window.QRCode)new QRCode(q,{text:upiLink(),width:130,height:130,correctLevel:QRCode.CorrectLevel.M})});
+  $('#cs').onclick=async()=>{
+    const msg=$('#ct').value.trim(); if(!msg){$('#cr').innerHTML='<div class="er">Please write a comment first.</div>';return}
+    $('#cs').disabled=true;
+    try{const r=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(CONFIG.commentEmail),{method:"POST",
+        headers:{"Content-Type":"application/json",Accept:"application/json"},
+        body:JSON.stringify({_subject:"New comment on: "+p.title,post:p.title,name:$('#cn').value||"Anonymous",email:$('#ce').value,message:msg,_captcha:"false"})});
+      if(!r.ok)throw 0;$('#cr').innerHTML='<div class="ok">Sent — thank you!</div>';$('#ct').value=""}
+    catch(e){$('#cr').innerHTML='<div class="er">Could not send. Check commentEmail in CONFIG.</div>'}
+    $('#cs').disabled=false};
+}
+
+/* ---------- router: 3 pages in 1 file ---------- */
+function route(top=true){
+  const h=CUR, m=h.match(/^#\/post\/(.+)$/), page=m?"post":h=="#/posts"?"posts":"home";
+  document.body.dataset.page=page;
+  $('#home').hidden=page!="home"; $('#listPage').hidden=page!="posts"; $('#postPage').hidden=page!="post";
+  document.querySelectorAll(".nl a[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r==page||(page=="post"&&a.dataset.r=="posts")));
+  if(page!="post")document.title=CONFIG.siteName;
+  if(page=="post")drawPost(decodeURIComponent(m[1])); else if(page=="posts")drawList(); else window.netResize&&netResize();
+  if(top)scrollTo(0,0);
+}
+/* Navigation is handled in JS (not by the browser), so it also works inside preview frames and file:// */
+let CUR=location.hash;
+function go(h){CUR=h;try{history.pushState(null,"",h)}catch(e){}route(true)}
+document.addEventListener("click",e=>{const a=e.target.closest('a[href^="#/"]');if(!a||e.metaKey||e.ctrlKey||e.shiftKey)return;e.preventDefault();go(a.getAttribute("href"))});
+addEventListener("hashchange",()=>{CUR=location.hash;route(true)});
+addEventListener("popstate",()=>{CUR=location.hash;route(true)});
+addEventListener("scroll",()=>{const d=document.documentElement;$('#prog').style.width=document.body.dataset.page=="post"?(scrollY/(d.scrollHeight-innerHeight||1)*100)+"%":"0"});
+
+/* ---------- hero terminal ---------- */
+(function(){let i=0,j=0;const el=$('#term'),L=CONFIG.terminalLines;
+ (function t(){const s=L[i];el.textContent=s.slice(0,++j);if(j>=s.length){j=0;i=(i+1)%L.length;return setTimeout(t,2200)}setTimeout(t,45)})()})();
+
+/* ---------- golden glitter on the button ---------- */
+(function(){const b=$('#go');if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ const s=()=>{const e=document.createElement("i");e.className="sp";e.style.cssText=`left:${Math.random()*110-5}%;top:${Math.random()*140-20}%;--s:${6+Math.random()*13}px`;b.appendChild(e);setTimeout(()=>e.remove(),1000)};
+ setInterval(s,240);b.addEventListener("mousemove",()=>{s();s()})})();
+
+/* ---------- home canvas: interactive network (click = breach wave) ---------- */
+(function(){
+ const c=$('#net'),x=c.getContext("2d"),mouse={x:-999,y:-999};let W,H,N=[],P=[];
+ window.netResize=()=>{W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;
+  N=Array.from({length:Math.min(110,W/11|0)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,hot:0}))};
+ netResize();addEventListener("resize",()=>document.body.dataset.page=="home"&&netResize());
+ const hero=c.parentElement;
+ hero.addEventListener("mousemove",e=>{const r=c.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top});
+ hero.addEventListener("mouseleave",()=>mouse.x=-999);
+ hero.addEventListener("click",e=>{const r=c.getBoundingClientRect();N.forEach(n=>{if(Math.hypot(n.x-(e.clientX-r.left),n.y-(e.clientY-r.top))<160)n.hot=1})});
+ setInterval(()=>{const n=N[Math.random()*N.length|0];if(n)n.hot=1},1400);
+ setInterval(()=>{const a=N[Math.random()*N.length|0],b=N[Math.random()*N.length|0];if(a&&b)P.push({a,b,t:0})},300);
+ (function f(){requestAnimationFrame(f);if(document.body.dataset.page!="home")return;x.clearRect(0,0,W,H);
+  for(const n of N){n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;
+   const dx=n.x-mouse.x,dy=n.y-mouse.y,d=Math.hypot(dx,dy);if(d<130){n.x+=dx/d*1.6;n.y+=dy/d*1.6}n.hot=Math.max(0,n.hot-.008)}
+  for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){const a=N[i],b=N[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+   if(d<120){const h=Math.max(a.hot,b.hot);x.strokeStyle=h>.05?`rgba(255,77,109,${.5*h+.1})`:`rgba(124,140,255,${.22*(1-d/120)})`;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();
+    if(h>.5){a.hot=Math.max(a.hot,h-.06);b.hot=Math.max(b.hot,h-.06)}}}
+  for(const n of N){x.fillStyle=n.hot>.05?"#ff4d6d":"#22d3ee";x.globalAlpha=n.hot>.05?1:.7;x.beginPath();x.arc(n.x,n.y,n.hot>.05?3+n.hot*3:2,0,6.3);x.fill()}
+  x.globalAlpha=1;
+  for(const p of P){p.t+=.02;x.fillStyle="#fff";x.shadowColor="#22d3ee";x.shadowBlur=10;x.fillRect(p.a.x+(p.b.x-p.a.x)*p.t-1.5,p.a.y+(p.b.y-p.a.y)*p.t-1.5,3,3)}
+  x.shadowBlur=0;P=P.filter(p=>p.t<1);
+  if(mouse.x>0){const g=x.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,150);g.addColorStop(0,"rgba(255,210,74,.16)");g.addColorStop(1,"transparent");x.fillStyle=g;x.fillRect(0,0,W,H)}})();
+})();
+
+/* ---------- WebGL background (posts + post pages): flowing aurora, grid, gold cursor light ---------- */
+(function(){
+ const c=$('#gl'),gl=c.getContext("webgl",{antialias:false,alpha:false});if(!gl)return;
+ const FS=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 r;uniform vec2 m;uniform float t;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n(p);p=p*2.03+1.7;a*=.5;}return s;}
+void main(){
+ vec2 uv=gl_FragCoord.xy/r;vec2 p=(gl_FragCoord.xy-.5*r)/r.y;
+ vec2 q=p*2.2+vec2(0.,t*.04);
+ float f=fbm(q+fbm(q+t*.07)*1.6);
+ vec3 c=mix(vec3(.03,.03,.1),vec3(.42,.22,.95),f);
+ c=mix(c,vec3(.05,.8,.95),smoothstep(.5,.95,fbm(q*1.4-t*.06)));
+ vec2 g=abs(fract(p*9.+vec2(0.,t*.05))-.5);c+=smoothstep(.465,.5,max(g.x,g.y))*.07;
+ float d=length((uv-m)*vec2(r.x/r.y,1.));
+ c+=vec3(1.,.78,.3)*exp(-d*4.5)*.4;
+ c*=.55+.45*smoothstep(1.3,.2,length(p));
+ gl_FragColor=vec4(c*.8,1.);}`;
+ const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o},p=gl.createProgram();
+ gl.attachShader(p,sh(gl.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(p);
+ if(!gl.getProgramParameter(p,gl.LINK_STATUS))return;     // falls back to the CSS gradient
+ gl.useProgram(p);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+ const l=gl.getAttribLocation(p,"a");gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+ const U=k=>gl.getUniformLocation(p,k);let mx=.5,my=.5,tx=.5,ty=.5;
+ addEventListener("pointermove",e=>{tx=e.clientX/innerWidth;ty=1-e.clientY/innerHeight});
+ const rs=()=>{c.width=innerWidth*.5|0;c.height=innerHeight*.5|0;gl.viewport(0,0,c.width,c.height)};rs();addEventListener("resize",rs);
+ (function f(){requestAnimationFrame(f);if(document.body.dataset.page=="home")return;
+  mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform2f(U("r"),c.width,c.height);gl.uniform2f(U("m"),mx,my);gl.uniform1f(U("t"),performance.now()/1000);gl.drawArrays(gl.TRIANGLES,0,3)})();
+})();
+
+route(false); load();
+</script>
+
+<!--
+=====================================================================
+ ADD A NEW POST — 30 SECONDS
+ 1. On GitHub open your repo → posts folder → Add file → Create new file
+ 2. Name it like  2026-10-08-my-title.txt   (the date in the name is used if you skip date:)
+ 3. Paste this and press Commit. The site shows it automatically.
+
+    My Post Title Goes Here
+    category: Forensics
+    tags: ntfs, timeline
+    ---
+    ## First heading
+    Write normally. **bold**, *italic*, `code`, [link](https://example.com)
+
+    - bullet
+    - bullet
+
+ ONLY the first line (title) is required. Optional: date, category, tags, author, summary.
+ You can also write them as  title:  /  TITLE:  — case doesn't matter.
+=====================================================================
+-->
+</body>
+</html>
