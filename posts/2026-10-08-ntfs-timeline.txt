@@ -1,0 +1,71 @@
+TITLE: Building Confidence on IMEI Number
+DATE: 2026-10-08
+CATEGORY: Forensics
+TAGS: IMEI
+SUMMARY: One-liner on IMEI number
+---
+Introduction
+The IMEI: The Phone's DNA That Can't Be Lied To
+Here's the thing most people — including most investigators — get wrong: they treat the IMEI as a "phone number for the device." That's like calling a fingerprint "a number for the person." It's not a number. It's an identity, burned into the hardware at the factory, and it outlives every SIM, every reset, every "I threw the phone in the river" story a suspect will ever tell you.
+
+What the IMEI Actually Is
+The International Mobile Equipment Identity is a 15-digit unique identifier permanently assigned to every cellular device at manufacturing.  It's not stored in a file you can delete. It's not tied to the SIM. It's wired into the baseband processor — the chip that talks to the cell tower. When your phone powers on and registers on a network, the very first thing the tower reads isn't your number. It's the IMEI.
+
+The 15 digits break down like this:
+
+Segment	Digits	What It Tells You	Who Assigned It
+TAC (Type Allocation Code)	First 8	Manufacturer + model	GSMA (global registry)
+SNR (Serial Number)	Next 6	Unique unit within that model	Manufacturer
+Check Digit	Last 1	Luhn algorithm validation	Calculated
+
+Read as a pattern: AA-BBBBBB-CCCCCC-D
+
+The TAC alone tells you the brand, model, and approximate production era. The SNR makes it unique to that specific unit. The check digit is a Luhn checksum — the same algorithm used on credit card numbers — that lets any system instantly flag a typo or a deliberately fabricated IMEI. 
+
+The Facts That Should Make You Rethink Everything
+1. The IMEI is in the chip, not the software.
+A factory reset wipes the OS. It does not touch the IMEI. A suspect who "reformats the phone" to destroy evidence has destroyed nothing that matters. The IMEI lives in the NV (Non-Volatile) memory of the baseband processor. To actually change it, you need either a hardware-level IMEI chip swap or a software exploit that writes directly to NV memory. Both leave traces. Both are illegal under India's 2017 Prevention of Tampering Rules. 
+
+2. Dual-SIM phones have TWO IMEIs.
+This is the one that catches people off guard. A dual-SIM device has two separate IMEI numbers — one for each radio. A tri-SIM phone (common in India) has three. If you're pulling CDRs and only tracking IMEI 1, you're literally blind to half the device's network activity. Always extract and track all IMEIs on a multi-SIM device.
+
+3. The IMEI can be read without the phone being "on."
+Researchers at the Technical University of Dresden demonstrated a technique where the radio frequency emissions of a phone — the tiny, unchangeable imperfections in its signal — act as a hardware fingerprint. Even if the IMEI is spoofed and the SIM is swapped, the phone's RF signature is unique, like a voiceprint. In their tests, they correctly identified 13 out of 13 phones at 97.62% accuracy using passive signal analysis alone. The phone was talking to the tower whether the suspect wanted it to or not.
+
+4. The Luhn check digit is your first lie detector.
+Before you even open a database, run the Luhn algorithm on any IMEI you encounter. If the check digit doesn't validate, the IMEI is either misrecorded or fabricated. In a case where a suspect "volunteers" an IMEI during interrogation, a 10-second Luhn check can tell you they're making it up. No database needed. No delay. Just math.
+
+5. The TAC reveals the country of manufacture.
+The first two digits of the TAC (the Reporting Body Identifier) are allocated by the GSMA and map to specific countries/regions. A phone supposedly "bought in Delhi" but with a TAC pointing to a manufacturer in a different country? That's a provenance red flag — the device may be assembled in a different supply chain than the suspect claims, which matters in cross-border trafficking cases. 
+
+6. IMEI blacklisting is a global network, not a national one.
+The GSMA maintains a global IMEI registry.  When a phone is reported stolen in India, the IMEI can be pushed to the GSMA's IMEI Shared Database, which operators worldwide can query. A stolen phone that travels to Dubai or Singapore can still be flagged at the network level. This is why "just go abroad with the phone" is a worse alibi than people think.
+
+7. The IMEI is in more places than you'd expect on a seized device.
+In a forensic extraction, the IMEI doesn't just live in one file. It appears in:
+
+*#06# dialer output
+Settings → About Phone
+The SIM tray (physically printed on many devices)
+/data/user_de/0/com.samsung.android.fmm/shared_prefs/ (Samsung)
+/data/data/com.samsung.android.mobileservice/shared_prefs/coreapps_pref.xml
+/data/user_de/0/com.samsung.android.fmm/databases/value.db
+Baseband NV memory (requires chip-level extraction) 
+If the IMEI in *#06# doesn't match the IMEI in the NV memory or the physical label, you have documented tampering.  That's not a lead. That's exhibit A.
+
+8. IMEI cloning is real, and it's the #1 threat to CDR-based investigations.
+A cloned IMEI means two physical devices presenting the same identity to the network. The CDR will show both devices registering on the same tower at the same time — or, more dangerously, one device registering in Delhi and the other in Mumbai within a 30-second window. Physically impossible for one phone. If you see that in a CDR, you have a clone. The "real" phone and the "ghost" phone are now two separate investigative threads.
+
+9. The IMEI survives a "dead" phone.
+A phone with a dead battery, a cracked screen, or a "bricked" OS still has its IMEI in the baseband NV memory. Forensic tools like Cellebrite and Oxygen Forensics can extract the IMEI from a powered-off device via chip-off or JTAG access. The phone doesn't need to boot. It doesn't need to cooperate. The IMEI is there, in silicon, waiting.
+
+10. In India, the IMEI is legally protected — and tampering is a criminal offense.
+Under the Telecom (Regulation) Amendment Rules and the 2017 Prevention of Tampering Rules, altering an IMEI is a punishable offense with penalties including imprisonment. This means: if you prove a suspect changed their IMEI, you don't just have the original device identity — you have an additional criminal charge stacked on top of whatever they're already being investigated for.
+
+Most CDR analysis in Indian police stops at Excel pivot tables and basic tower mapping. That's fine for a local theft. But when you're dealing with a kidnapping ring, a cyber-fraud network spanning four states, or a suspect who rotates burner SIMs every 48 hours, the spreadsheet approach gets you nowhere. Here's how an FBI-grade analyst actually thinks about CDR data — the techniques that turn a wall of CSV rows into a conviction-ready narrative.
+The IMEI is the Real Number, Not the Phone Number
+The single most missed tip: the IMEI is the identity, the SIM is a costume. A suspect who swaps 12 SIM cards over 3 months believes their trail is broken. It isn't. Every CDR row carries the IMEI of the physical device. When you group all CDRs by IMEI across multiple numbers, you see one continuous communication pattern that no amount of SIM rotation can erase. 
+
+Pull all CDRs for every number linked to the case
+Group by IMEI, not by calling/called number
+Look for the "ghost number" — a number that appears only in the IMEI group, never in any witness statement or call log. That's your hidden coordinator.
